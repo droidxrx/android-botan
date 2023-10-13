@@ -53,7 +53,7 @@ build() {
     export RANLIB="$ANDROID_NDK_BIN/llvm-ranlib"
     export STRIP="$ANDROID_NDK_BIN/llvm-strip"
     local SYSROOT="$(realpath "$ANDROID_NDK_BIN/../sysroot")"
-    local OUTPUT_DIR="$INSTALL_DIR/$ANDROID_ABI_LONG"
+    local OUTPUT_DIR="$INSTALL_DIR/android-botan/$ANDROID_ABI_LONG"
 
     rm -rf "$BUILD_DIR"
 
@@ -80,5 +80,19 @@ build() {
 }
 
 rm -rf "$INSTALL_DIR"
+build armeabi-v7a
 build arm64-v8a
 build x86_64
+
+cat >>"$INSTALL_DIR/android-botan/AndroidBotan.cmake" <<EOF
+set(ANDROID_BOTAN_DIR "\${CMAKE_CURRENT_LIST_DIR}/\${ANDROID_ABI}")
+add_library(AndroidBotan STATIC IMPORTED)
+set_property(TARGET AndroidBotan PROPERTY IMPORTED_LOCATION "\${ANDROID_BOTAN_DIR}/lib/libbotan-3.a")
+target_compile_features(AndroidBotan INTERFACE cxx_std_20)
+target_include_directories(
+    AndroidBotan INTERFACE
+    $<BUILD_INTERFACE:\${ANDROID_BOTAN_DIR}/include/botan-3/>
+    $<INSTALL_INTERFACE:include>
+)
+unset(ANDROID_BOTAN_DIR)
+EOF

@@ -1,0 +1,12 @@
+{
+	"clangd.arguments": [
+		"--background-index",
+		"--pch-storage=memory",
+		"--offset-encoding=utf-8",
+		"--header-insertion=never",
+		"--pretty",
+		"--clang-tidy",
+		"--completion-style=detailed",
+		"--compile-commands-dir=${workspaceFolder}/build/build"
+	]
+}
